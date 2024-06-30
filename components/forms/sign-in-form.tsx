@@ -16,16 +16,6 @@ import { signInFormSchema } from "@/lib/form-schemas"
 import { signIn } from "@/server-actions/sign-in"
 
 export const SignInForm = () => {
-    const searchParams = useSearchParams()
-
-    const error = searchParams.get("error")
-
-    const oauthAccountNotLinkedError = error === "OAuthAccountNotLinked"
-
-    if (oauthAccountNotLinkedError) {
-        return redirect("/error")
-    }
-
     const [type, setType] = useState<"password" | "text">("password")
 
     const form = useForm<z.infer<typeof signInFormSchema>>({
@@ -51,6 +41,16 @@ export const SignInForm = () => {
             }
         })
     })
+
+    const searchParams = useSearchParams()
+
+    const error = searchParams.get("error")
+
+    const oauthAccountNotLinkedError = error === "OAuthAccountNotLinked"
+
+    if (oauthAccountNotLinkedError) {
+        return redirect("/error")
+    }
 
     return (
         <Form {...form}>
