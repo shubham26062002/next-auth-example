@@ -1,93 +1,68 @@
 "use client"
 
-import { InferRequestType } from "hono"
+import { redirect, useSearchParams } from "next/navigation"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { VscEye, VscEyeClosed } from "react-icons/vsc"
 import { TbLoader2 } from "react-icons/tb"
-import useSWRMutation from "swr/mutation"
 import { toast } from "sonner"
 
-import { client } from "@/lib/hono"
 import { Button } from "@/components/ui/button"
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { signUpFormSchema } from "@/lib/form-schemas"
+import { signInFormSchema } from "@/lib/form-schemas"
 import { signIn } from "@/server-actions/sign-in"
 
-export const SignUpForm = () => {
+export const SignInForm = () => {
+    const searchParams = useSearchParams()
+
+    const error = searchParams.get("error")
+
+    const oauthAccountNotLinkedError = error === "OAuthAccountNotLinked"
+
+    if (oauthAccountNotLinkedError) {
+        return redirect("/error")
+    }
+
     const [type, setType] = useState<"password" | "text">("password")
 
-    const form = useForm<z.infer<typeof signUpFormSchema>>({
-        resolver: zodResolver(signUpFormSchema),
+    const form = useForm<z.infer<typeof signInFormSchema>>({
+        resolver: zodResolver(signInFormSchema),
         defaultValues: {
-            name: "",
             email: "",
             password: "",
         },
     })
 
-    const { trigger, isMutating } = useSWRMutation("/api/users", async (_, {
-        arg,
-    }: {
-        arg: InferRequestType<typeof client.api.users.$post>["json"],
-    }) => {
-        const response = await client.api.users.$post({
-            json: arg,
-        })
-
-        const responseData = await response.json()
-
-        return responseData
-    })
+    const [isPending, startTransition] = useTransition()
 
     const handleSubmit = form.handleSubmit(async (data) => {
-        const response = await trigger(data)
+        startTransition(async () => {
+            const response = await signIn(data)
 
-        if ("error" in response) {
-            toast.error(response.error)
+            if (typeof response !== "undefined") {
+                if (!response.success) {
+                    toast.error(response.message)
 
-            return
-        }
-
-        const signInResponse = await signIn({
-            email: response.email,
-            password: data.password,
-        })
-
-        if (typeof signInResponse !== "undefined") {
-            if (!signInResponse.success) {
-                toast.error(signInResponse.message)
-
-                return
+                    return
+                }
             }
-        }
+        })
     })
 
     return (
         <Form {...form}>
             <form className="space-y-6" onSubmit={handleSubmit}>
                 <div className="space-y-4">
-                    <FormField control={form.control} name="name" render={({
-                        field,
-                    }) => (
-                        <FormItem>
-                            <FormLabel>Name</FormLabel>
-                            <FormControl>
-                                <Input placeholder="Jhon Doe" disabled={isMutating} {...field} />
-                            </FormControl>
-                            <FormMessage />
-                        </FormItem>
-                    )} />
                     <FormField control={form.control} name="email" render={({
                         field,
                     }) => (
                         <FormItem>
                             <FormLabel>Email</FormLabel>
                             <FormControl>
-                                <Input placeholder="jhondoe@example.com" disabled={isMutating} {...field} />
+                                <Input placeholder="jhondoe@example.com" disabled={isPending} {...field} />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -99,8 +74,8 @@ export const SignUpForm = () => {
                             <FormLabel>Password</FormLabel>
                             <FormControl>
                                 <div className="relative">
-                                    <Input type={type} placeholder="******" disabled={isMutating} {...field} />
-                                    <button className="absolute top-1/2 -translate-y-1/2 right-3 disabled:opacity-50 disabled:pointer-events-none" type="button" disabled={isMutating} onClick={() => {
+                                    <Input type={type} placeholder="******" disabled={isPending} {...field} />
+                                    <button className="absolute top-1/2 -translate-y-1/2 right-3 disabled:opacity-50 disabled:pointer-events-none" type="button" disabled={isPending} onClick={() => {
                                         setType((previousType) => previousType === "password" ? "text" : "password")
                                     }}>
 
@@ -117,9 +92,9 @@ export const SignUpForm = () => {
                         </FormItem>
                     )} />
                 </div>
-                <Button className="w-full" type="submit" disabled={isMutating}>
+                <Button className="w-full" type="submit" disabled={isPending}>
 
-                    {isMutating ? (
+                    {isPending ? (
                         <TbLoader2 className="animate-spin" />
                     ) :
                         "Continue"

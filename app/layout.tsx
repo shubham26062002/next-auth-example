@@ -4,6 +4,7 @@ import { Outfit } from "next/font/google"
 import { cn } from "@/lib/utils"
 import "@/app/globals.css"
 import { ThemeProvider } from "@/components/providers/theme-provider"
+import { Toaster } from "@/components/ui/sonner"
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -26,7 +27,10 @@ const RootLayout = ({
   return (
     <html className="h-full antialiased" lang="en" suppressHydrationWarning>
       <body className={cn("h-full", outfit.className)}>
-        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false} disableTransitionOnChange>{children}</ThemeProvider>
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false} disableTransitionOnChange>
+          <Toaster position="bottom-center" />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

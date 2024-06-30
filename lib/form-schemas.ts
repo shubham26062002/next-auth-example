@@ -11,3 +11,12 @@ export const signUpFormSchema = z.object({
         message: "Password must be at least 6 characters long",
     }),
 })
+
+export const signInFormSchema = z.object({
+    email: z.string().email({
+        message: "Email is invalid",
+    }),
+    password: z.string().min(1, {
+        message: "Password is required",
+    }),
+})
