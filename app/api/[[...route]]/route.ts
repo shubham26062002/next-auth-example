@@ -31,12 +31,6 @@ app
             async session({ session, token }) {
                 if (session.user && token.sub) {
                     session.user.id = token.sub
-
-                    const user = await getUserById(token.sub)
-
-                    if (user) {
-                        session.user.hasPassword = !!user.passwordHash
-                    }
                 }
 
                 return session
