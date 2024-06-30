@@ -12,3 +12,13 @@ export const getUserByEmail = async (email: string) => {
 
     return user
 }
+
+export const getUserById = async (id: string) => {
+    const [user] = await db.select().from(users).where(sql`${users.id} = ${id}`)
+
+    if (!user) {
+        return null
+    }
+
+    return user
+}

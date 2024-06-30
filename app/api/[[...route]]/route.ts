@@ -7,6 +7,7 @@ import Credentials from "@auth/core/providers/credentials"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import bcrypt from "bcryptjs"
 
+import { getUserById } from "@/lib/users-utils"
 import { signInFormSchema } from "@/lib/form-schemas"
 import { getUserByEmail } from "@/lib/users-utils"
 import { db } from "@/drizzle/db"
@@ -25,6 +26,21 @@ app
         pages: {
             signIn: "/sign-in",
             error: "/error",
+        },
+        callbacks: {
+            async session({ session, token }) {
+                if (session.user && token.sub) {
+                    session.user.id = token.sub
+
+                    const user = await getUserById(token.sub)
+
+                    if (user) {
+                        session.user.hasPassword = !!user.passwordHash
+                    }
+                }
+
+                return session
+            }
         },
         providers: [
             GitHub({
@@ -69,5 +85,7 @@ const routes = app
 
 export const GET = handle(app)
 export const POST = handle(app)
+export const PATCH = handle(app)
+export const DELETE = handle(app)
 
 export type AppType = typeof routes

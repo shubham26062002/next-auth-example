@@ -26,7 +26,7 @@ export const Navbar = () => {
         <nav className="flex gap-x-4">
 
             {navbarLinksData.map((item, index) => (
-                <Button className={cn(item.href === pathname && "bg-accent text-accent-foreground")} variant="ghost" size="sm" asChild>
+                <Button key={index} className={cn(item.href === pathname && "bg-accent text-accent-foreground")} variant="ghost" size="sm" asChild>
                     <Link href={item.href}>{item.label}</Link>
                 </Button>
             ))}

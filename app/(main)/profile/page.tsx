@@ -9,7 +9,7 @@ const ProfilePage = async () => {
             <div className="w-full max-w-md flex flex-col gap-y-6">
                 <h1 className="text-4xl text-center tracking-tight leading-none font-semibold">Welcome, {session?.user.name}</h1>
                 <div className="max-w-xs mx-auto w-full">
-                    <ProfileDropdownMenu />
+                    <ProfileDropdownMenu showResetPassword={session?.user.hasPassword!} />
                 </div>
             </div>
         </div>
