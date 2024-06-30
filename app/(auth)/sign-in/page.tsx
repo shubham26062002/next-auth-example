@@ -4,6 +4,8 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Button } from "@/components/ui/button"
 import { OAuthButtons } from "@/components/oauth-buttons"
 import { SignInForm } from "@/components/forms/sign-in-form"
+import { Suspense } from "react"
+import { TbLoader2 } from "react-icons/tb"
 
 const SignInPage = () => {
     return (
@@ -12,7 +14,9 @@ const SignInPage = () => {
                 <CardTitle>Sign in</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-                <SignInForm />
+                <Suspense fallback={<LoadingSkeleton />}>
+                    <SignInForm />
+                </Suspense>
                 <div className="flex items-center gap-x-4">
                     <p className="text-xs uppercase text-muted-foreground tracking-wide leading-none">Or use</p>
                     <div className="h-px flex-1 bg-border" />
@@ -29,3 +33,11 @@ const SignInPage = () => {
 }
 
 export default SignInPage
+
+const LoadingSkeleton = () => {
+    return (
+        <div className="flex items-center justify-center text-xl text-muted-foreground">
+            <TbLoader2 className="animate-spin" />
+        </div>
+    )
+}
