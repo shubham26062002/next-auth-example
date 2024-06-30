@@ -11,7 +11,7 @@ const ErrorPage = () => {
                 <CardTitle>Provider conflict error</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="p-4 flex items-center gap-x-4 text-sm bg-destructive/40 border border-destructive">
+                <div className="p-4 flex items-center gap-x-4 text-sm bg-rose-600/40 border border-rose-600">
                     <MdErrorOutline className="flex-shrink-0 text-2xl" />
                     <p>Using a different provider than the one you used to create your account is not allowed.</p>
                 </div>

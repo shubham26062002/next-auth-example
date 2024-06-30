@@ -8,7 +8,9 @@ const authRoutes = [
     "/error",
 ]
 
-const publicRoutes: string[] = []
+const publicRoutes = [
+    "/",
+]
 
 export default auth((request) => {
     const isSignedIn = !!request.auth
